@@ -1,5 +1,5 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, Shutdown
+from launch.actions import DeclareLaunchArgument, Shutdown, TimerAction
 from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node, LifecycleNode
@@ -98,6 +98,45 @@ def generate_launch_description():
                                 parameters=[parameter_file],
                                 namespace='/',
                                 )
+    
+    # added by 0907smko@gmail.com
+
+    # imu_node = Node(
+    #     package='arm_sensor_calibration',
+    #     executable='ebimu_pub',
+    #     name='ebimu_publisher',
+    #     output='screen',
+    #     remappings=[('/imu_data', 'imu_data')]
+    # )
+
+    imu_raw_publisher_node = Node(
+        package='arm_sensor_calibration',
+        executable='raw_imu_pub',
+        name='imu_raw_publisher',
+        output='screen'
+    )
+
+    # Node to run imu_data_filter
+    # imu_data_filter_node = Node(
+    #     package='arm_sensor_calibration',
+    #     executable='madgwick_imu_pub',
+    #     name='imu_data_filter',
+    #     output='screen'
+    # )
+
+    # Start Madgwick Filter Node with a delay to allow IMU Raw Publisher to initialize
+    imu_data_filter_node = TimerAction(
+        period=3.0,  # Delay in seconds
+        actions=[
+            Node(
+                package='arm_sensor_calibration',
+                executable='madgwick_imu_pub',
+                name='imu_data_filter',
+                output='screen'
+            )
+        ]
+    )
+
 
     return LaunchDescription([
         RegisterEventHandler(
@@ -128,4 +167,7 @@ def generate_launch_description():
         control_node,
         ydlidar_params_declare,
         ydlidar_driver_node,
+        # imu_node,
+        imu_raw_publisher_node,
+        imu_data_filter_node,
     ])
