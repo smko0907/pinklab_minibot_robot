@@ -102,7 +102,7 @@ def generate_launch_description():
     # added by 0907smko@gmail.com
 
     # imu_node = Node(
-    #     package='arm_sensor_calibration',
+    #     package='ebimu_generator',
     #     executable='ebimu_pub',
     #     name='ebimu_publisher',
     #     output='screen',
@@ -110,7 +110,7 @@ def generate_launch_description():
     # )
 
     imu_raw_publisher_node = Node(
-        package='arm_sensor_calibration',
+        package='ebimu_generator',
         executable='raw_imu_pub',
         name='imu_raw_publisher',
         output='screen'
@@ -118,7 +118,7 @@ def generate_launch_description():
 
     # Node to run imu_data_filter
     # imu_data_filter_node = Node(
-    #     package='arm_sensor_calibration',
+    #     package='ebimu_generator',
     #     executable='madgwick_imu_pub',
     #     name='imu_data_filter',
     #     output='screen'
@@ -129,7 +129,7 @@ def generate_launch_description():
         period=3.0,  # Delay in seconds
         actions=[
             Node(
-                package='arm_sensor_calibration',
+                package='ebimu_generator',
                 executable='madgwick_imu_pub',
                 name='imu_data_filter',
                 output='screen'
