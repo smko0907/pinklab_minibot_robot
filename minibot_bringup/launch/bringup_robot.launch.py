@@ -6,6 +6,7 @@ from launch_ros.actions import Node, LifecycleNode
 from launch.event_handlers import OnProcessExit, OnExecutionComplete, OnProcessStart
 from launch_ros.substitutions import FindPackageShare
 from ament_index_python.packages import get_package_share_directory
+from launch_ros.parameter_descriptions import ParameterValue
 from launch.substitutions import PathJoinSubstitution, Command, LaunchConfiguration
 from launch.conditions import LaunchConfigurationEquals
 
@@ -33,6 +34,10 @@ def generate_launch_description():
 
     ])
     robot_description = {"robot_description": robot_description_content}
+
+    # robot_description = {
+    #     "robot_description": ParameterValue(robot_description_content, value_type=str)
+    # }
 
     robot_controllers = PathJoinSubstitution([
             FindPackageShare('minibot_bringup'),
@@ -99,8 +104,6 @@ def generate_launch_description():
                                 namespace='/',
                                 )
     
-    # added by 0907smko@gmail.com
-
     # imu_node = Node(
     #     package='ebimu_generator',
     #     executable='ebimu_pub',
@@ -117,24 +120,18 @@ def generate_launch_description():
     )
 
     # Node to run imu_data_filter
-    # imu_data_filter_node = Node(
-    #     package='ebimu_generator',
-    #     executable='madgwick_imu_pub',
-    #     name='imu_data_filter',
-    #     output='screen'
-    # )
+    imu_data_filter_node = Node(
+        package='ebimu_generator',
+        executable='madgwick_imu_pub',
+        name='imu_data_filter',
+        output='screen'
+    )
 
-    # Start Madgwick Filter Node with a delay to allow IMU Raw Publisher to initialize
-    imu_data_filter_node = TimerAction(
-        period=3.0,  # Delay in seconds
-        actions=[
-            Node(
-                package='ebimu_generator',
-                executable='madgwick_imu_pub',
-                name='imu_data_filter',
-                output='screen'
-            )
-        ]
+    ebimu_publisher_node = Node(
+        package='ebimu_generator',
+        executable='ebimu_pub',
+        name='imu_publisher',
+        output='screen'
     )
 
 
@@ -167,7 +164,7 @@ def generate_launch_description():
         control_node,
         ydlidar_params_declare,
         ydlidar_driver_node,
-        # imu_node,
-        imu_raw_publisher_node,
-        imu_data_filter_node,
+        # imu_raw_publisher_node,
+        # imu_data_filter_node,
+        ebimu_publisher_node
     ])
